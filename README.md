@@ -8,7 +8,7 @@ Go to the following link https://www.kaggle.com/competitions/data-science-bowl-2
 To process the Images and corresponding masks (labels) for the nuclei image. Use the script
 `preprocess.py` - This script prepares the image data. Loads images from downloaded data, prepares segmentation masks as labelled tensors.
 
-IMPORTANT PARAMETERS TO CHANGE IN SCRIPT
+*IMPORTANT PARAMETERS TO CHANGE IN SCRIPT*
 
 ```python
 # Define paths 
@@ -26,7 +26,7 @@ This will output 2 .pth files, one for train data (`train_data.pth`), and one fo
 To transform the images prior to training, Use the script
 `transform_train_images.py`
 
-IMPORTANT PARAMETERS TO CHANGE IN SCRIPT
+*IMPORTANT PARAMETERS TO CHANGE IN SCRIPT*
 
 ```python
 train_data = torch.load("your_file_path/train_test_data_pth/train_data.pth", weights_only=False)  # From Step 1
@@ -40,10 +40,16 @@ This will output the transformed saved training data as `train_data_transformed.
 If you are interested in seeing what the training data looks like (images and corresponding masks), you can use the following code
 `visualize_train_data.py` 
 
+*IMPORTANT PARAMETERS TO CHANGE IN SCRIPT*
+
+```python
+dataset = torch.load("your_file_path/transformed_train_data_pth/train_data_transformed.pth", weights_only=False)
+```
+
 # Step 5: Training the Model
 The script below will run model training using the processed and transformed training data created above.
 
-IMPORTANT PARAMETERS TO CHANGE IN SCRIPT
+*IMPORTANT PARAMETERS TO CHANGE IN SCRIPT*
 
 ```python
 DATASET_PATH="your_file_path/transformed_train_data_pth/train_data_transformed.pth"
