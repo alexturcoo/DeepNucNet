@@ -41,6 +41,21 @@ If you are interested in seeing what the training data looks like (images and co
 `visualize_train_data.py` 
 
 # Step 5: Training the Model
+The script below will run model training using the processed and transformed training data created above.
+
+IMPORTANT PARAMETERS TO CHANGE IN SCRIPT
+
+```python
+DATASET_PATH="your_file_path/transformed_train_data_pth/train_data_transformed.pth"
+BATCH_SIZE=16
+LEARNING_RATE=0.0001
+NUM_WORKERS=0
+EPOCHS=300
+TRAIN_RATIO=0.8
+VAL_INTERVAL=2
+```
+
+
 
 
 
