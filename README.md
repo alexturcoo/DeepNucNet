@@ -40,6 +40,8 @@ This will output the transformed saved training data as `train_data_transformed.
 If you are interested in seeing what the training data looks like (images and corresponding masks), you can use the following code
 `visualize_train_data.py` 
 
+![Visualization of Training Data Image and Masks.](/results/training_data_visualisation/row1.png)
+
 *IMPORTANT PARAMETERS TO CHANGE IN SCRIPT*
 
 ```python
@@ -56,11 +58,15 @@ DATASET_PATH="your_file_path/transformed_train_data_pth/train_data_transformed.p
 BATCH_SIZE=16
 LEARNING_RATE=0.0001
 NUM_WORKERS=0
-EPOCHS=300
+EPOCHS=10
 TRAIN_RATIO=0.8
 VAL_INTERVAL=2
+OUTPUT_DIR="your_file_path/DeepNucNet/results"
 ```
+Training will output the following plots to assess performance
 
+![Training Loss and Validation Loss Curves.](/results/saved_images/training_metrics.png)
+![Training Loss and Validation Loss Curves.](/results/saved_images/inference_0.png)
 
 
 
