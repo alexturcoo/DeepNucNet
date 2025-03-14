@@ -12,7 +12,7 @@ from monai.transforms import AsDiscrete, Compose, EnsureType
 from monai.data import decollate_batch
 
 # Import the model from model.py
-from model import model
+from model_unet1 import model
 # Import the Dataset class from the transformation script
 from transform_train_images import Dataset  
 

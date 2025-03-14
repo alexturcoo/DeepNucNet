@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 # Import the Dataset class from the transformation script
 from transform_train_images import Dataset  
 
-dataset = torch.load("/home/alextu/scratch/DeepNucNet/transformed_train_data_pth/train_data_transformed.pth", weights_only=False)
+dataset = torch.load("/home/alextu/scratch/DeepNucNet_computecanada/transformed_train_data_pth/train_data_transformed.pth", weights_only=False)
 print("Size of training dataset", len(dataset))
 
 # Extract an image-mask pair from the dataset
-img, mask = dataset[1]
+img, mask = dataset[4]
 
 # Print general dataset information
 print(f"Dataset size: {len(dataset)} samples")
@@ -36,5 +36,5 @@ plt.subplot(122)
 plt.imshow(mask_np, cmap="gray")  # Display mask
 plt.title("Segmentation Mask")
 
-plt.savefig("/home/alextu/scratch/DeepNucNet/results/training_data_visualisation/row1.png")
+plt.savefig("/home/alextu/scratch/DeepNucNet_computecanada/results/training_data_visualisation/row4.png")
 plt.show()
