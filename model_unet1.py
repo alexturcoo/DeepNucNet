@@ -17,5 +17,5 @@ model = UNet(
     norm=Norm.BATCH         # Batch Normalization
 ).to(device)
 
-print("Model loaded from model.py:")
+print("Model loaded from model_unet1.py:")
 print(model)

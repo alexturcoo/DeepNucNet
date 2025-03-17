@@ -11,8 +11,8 @@ from monai.metrics import DiceMetric
 from monai.transforms import AsDiscrete, Compose, EnsureType
 from monai.data import decollate_batch
 
-# Import the model from model.py
-from model_unet1 import model
+# Import the desired model from model_[DesiredModel].py
+from model_unetPlusPlus import model
 # Import the Dataset class from the transformation script
 from transform_train_images import Dataset  
 
@@ -103,6 +103,10 @@ def main():
 
             optimizer.zero_grad()
             outputs = model(inputs)
+            
+            if isinstance(outputs, (list)): #This is necessary only for UNET++ model, UNET++ tensor is contained in a list, we want the tensor only
+                outputs = outputs[0]
+
             loss = loss_function(outputs, labels)
             loss.backward()
             optimizer.step()
