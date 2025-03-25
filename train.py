@@ -12,9 +12,9 @@ from monai.transforms import AsDiscrete, Compose, EnsureType
 from monai.data import decollate_batch
 
 # Import the desired model from model_[DesiredModel].py
-from model_unetPlusPlus import model
+from model_unetR import model
 # Import the Dataset class from the transformation script
-from transform_train_images import Dataset  
+from transform_train_images import Dataset, PairedTransform 
 
 # Automatically use GPU if available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

@@ -1,40 +1,46 @@
 import torch
+import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib.pyplot as plt 
-# Import the Dataset class from the transformation script
-from transform_train_images import Dataset  
+import os
 
-dataset = torch.load("/home/alextu/scratch/DeepNucNet_computecanada/transformed_train_data_pth/train_data_transformed.pth", weights_only=False)
-print("Size of training dataset", len(dataset))
+from transform_train_images import Dataset, PairedTransform
 
-# Extract an image-mask pair from the dataset
-img, mask = dataset[4]
 
-# Print general dataset information
-print(f"Dataset size: {len(dataset)} samples")
-print(f"Image shape: {img.shape}")  # Shape in (C, H, W) format
-print(f"Mask shape: {mask.shape}")  # Shape in (1, H, W) format
+# Load your transformed dataset
+dataset = torch.load("/home/alextu/scratch/DeepNucNet_computecanada/transformed_train_data_pth/train_data_transformed.pth", weights_only = False)
 
-# Convert to NumPy arrays for further analysis
-img_np = img.permute(1, 2, 0).numpy()  # Convert image from (C, H, W) -> (H, W, C)
-mask_np = mask[0].numpy()  # Extract the single-channel mask
+# Choose a sample to visualize
+img, mask = dataset[22]  # Index can be changed to visualize other samples
 
-# Print mask statistics
-unique_labels = np.unique(mask_np)  # Get unique labels present in the mask
-num_masks = len(unique_labels) - 1  # Excluding background (assuming 0 is background)
+# Convert image to [H, W, C] format and unnormalize (from [-1, 1] → [0, 1])
+img_np = img.permute(1, 2, 0).numpy()
+img_np = (img_np * 0.5) + 0.5  # Undo normalization if you used mean=0.5, std=0.5
+img_np = np.clip(img_np, 0, 1)
 
-print(f"Unique labels in mask: {unique_labels}")
-print(f"Number of masks (segmentation objects): {num_masks}")
+# Convert mask to numpy and squeeze if needed
+mask_np = mask.numpy()
+if mask_np.ndim == 3:
+    mask_np = mask_np.squeeze()
 
-# Plot the image and mask
-plt.figure(figsize=(10, 5))
-plt.subplot(121)
-plt.imshow(img_np * 0.5 + 0.5)  # Denormalize and display image
+# Plot
+plt.figure(figsize=(12, 5))
+
+plt.subplot(1, 2, 1)
+plt.imshow(img_np)
 plt.title("Image")
+plt.axis("off")
 
-plt.subplot(122)
-plt.imshow(mask_np, cmap="gray")  # Display mask
-plt.title("Segmentation Mask")
+plt.subplot(1, 2, 2)
+plt.imshow(mask_np, cmap='gray')  # Great for visualizing instance labels
+plt.title("Segmentation Mask (Instances)")
+plt.axis("off")
 
-plt.savefig("/home/alextu/scratch/DeepNucNet_computecanada/results/training_data_visualisation/row4.png")
+plt.tight_layout()
+
+# Ensure output directory exists
+save_dir = "/home/alextu/scratch/DeepNucNet_computecanada/results/training_data_visualisation"
+os.makedirs(save_dir, exist_ok=True)
+
+# Save and show
+plt.savefig(os.path.join(save_dir, "row22.png"))
 plt.show()

@@ -1,49 +1,70 @@
 import PIL
 import torch
+import numpy as np
 from torchvision import transforms as tsf
-import random
+import torchvision.transforms.functional as F
 
-class Dataset():
-    def __init__(self, data, source_transform, target_transform):
+# Convert binary mask to float tensor in [0, 1]
+def binary_mask_to_tensor(x):
+    return torch.tensor(np.array(x), dtype=torch.float32) / 255.0
+
+class PairedTransform:
+    def __init__(self):
+        self.resize = tsf.Resize((256, 256))
+        self.normalize = tsf.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+        self.to_tensor = tsf.ToTensor()
+
+    def __call__(self, img, mask):
+        # Resize both image and mask
+        img = self.resize(img)
+        mask = self.resize(mask)
+
+        # Image: to tensor and normalize to [-1, 1]
+        img = self.to_tensor(img)
+        img = self.normalize(img)
+
+        # Mask: to float tensor in [0, 1]
+        mask = binary_mask_to_tensor(mask)
+
+        return img, mask
+
+class Dataset(torch.utils.data.Dataset):
+    def __init__(self, data, transform):
         self.datas = data
-        self.s_transform = source_transform
-        self.t_transform = target_transform
+        self.transform = transform
 
     def __getitem__(self, index):
         data = self.datas[index]
 
-        # Convert image and mask to NumPy
-        img = data['img'].numpy()
-        mask = data['mask'][:, :, None].byte().numpy()
+        # Convert image from [0,1] float → uint8 for PIL
+        img = PIL.Image.fromarray((data['img'].numpy() * 255).astype(np.uint8))
 
-        # Apply transformations
-        img = self.s_transform(img)
-        mask = self.t_transform(mask)
+        # Convert binary mask to PIL
+        mask = PIL.Image.fromarray((data['mask'].numpy() * 255).astype(np.uint8))
 
-        return img, mask
+        # Apply paired transforms
+        img, mask = self.transform(img, mask)
+
+        # Add channel dim to mask: [1, H, W]
+        return img, mask.unsqueeze(0)
 
     def __len__(self):
         return len(self.datas)
 
-# **Updated Transformations for 256x256 & Data Augmentation**
-s_trans = tsf.Compose([
-    tsf.ToPILImage(),
-    tsf.Resize((256, 256)),  # Resize to 256x256
-    tsf.RandomCrop(256),  # Keep 256x256 crops
-    tsf.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
-    tsf.RandomRotation(degrees=15),
-    tsf.ToTensor(),
-    tsf.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
-])
+# === Apply transform and save dataset ===
+if __name__ == "__main__":
+    paired_transform = PairedTransform()
 
-t_trans = tsf.Compose([
-    tsf.ToPILImage(),
-    tsf.Resize((256, 256), interpolation=PIL.Image.NEAREST),  # Resize to 256x256
-    tsf.RandomCrop(256),
-    tsf.ToTensor(),
-])
+    train_data = torch.load(
+        "/home/alextu/scratch/DeepNucNet_computecanada/train_test_data_pth/train_data.pth",
+        weights_only=False
+    )
 
-# **Load dataset and save transformed version**
-train_data = torch.load("/home/alextu/scratch/DeepNucNet_computecanada/train_test_data_pth/train_data.pth", weights_only=False)
-dataset = Dataset(train_data, s_trans, t_trans)
-torch.save(dataset, "/home/alextu/scratch/DeepNucNet_computecanada/transformed_train_data_pth/train_data_transformed.pth")
+    dataset = Dataset(train_data, paired_transform)
+
+    torch.save(
+        dataset,
+        "/home/alextu/scratch/DeepNucNet_computecanada/transformed_train_data_pth/train_data_transformed.pth"
+    )
+
+    print("Transformed dataset saved with masks shaped [1, 256, 256]. Ready for training.")
