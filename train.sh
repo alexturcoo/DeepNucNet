@@ -20,10 +20,11 @@ DATASET_PATH="/home/alextu/scratch/DeepNucNet_computecanada/transformed_train_da
 BATCH_SIZE=16
 LEARNING_RATE=0.0001
 NUM_WORKERS=0
-EPOCHS=100
+EPOCHS=200
 TRAIN_RATIO=0.8
 VAL_INTERVAL=2
 OUTPUT_DIR="/home/alextu/scratch/DeepNucNet_computecanada/results"
+PATIENCE=10
 
 # Display information
 echo "[INFO] Starting training script..."
@@ -44,6 +45,7 @@ python train.py \
     --epochs "$EPOCHS" \
     --train_ratio "$TRAIN_RATIO" \
     --val_interval "$VAL_INTERVAL" \
-    --output_dir "$OUTPUT_DIR"
+    --output_dir "$OUTPUT_DIR" \
+    --patience "$PATIENCE"
 
 echo "[INFO] Training completed."
