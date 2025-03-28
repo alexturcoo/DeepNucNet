@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=10G
+#SBATCH --mem=40G
 #SBATCH --time=4:00:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=alexanderturco1@gmail.com
@@ -20,8 +20,8 @@ PARAM_LINE=$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" param_list.txt)
 IFS=',' read -r BATCH_SIZE LEARNING_RATE EPOCHS <<< "$PARAM_LINE"
 
 # Fixed params
-DATASET_PATH="/home/alextu/scratch/DeepNucNet_computecanada/transformed_train_data_pth/train_data_transformed.pth"
-OUTPUT_DIR="/home/alextu/scratch/DeepNucNet_computecanada/tune_array_results/bs${BATCH_SIZE}_lr${LEARNING_RATE}_ep${EPOCHS}"
+DATASET_PATH="/home/alextu/scratch/DeepNucNet_computecanada/transformed_train_data_pth/train_data_augmented.pth"
+OUTPUT_DIR="/home/alextu/scratch/DeepNucNet_computecanada/tune_array_results_with_augmentations/model_unetR/bs${BATCH_SIZE}_lr${LEARNING_RATE}_ep${EPOCHS}"
 TRAIN_RATIO=0.8
 VAL_INTERVAL=2
 NUM_WORKERS=0

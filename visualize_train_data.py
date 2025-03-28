@@ -3,14 +3,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-from transform_train_images import Dataset, PairedTransform
-
+# Change this for visualizing augmented train data vs non-augmented train data 
+#from transform_train_test_images_with_augmentations import Dataset, PairedTransform
+from transform_train_test_images_no_augmentations import Dataset, PairedTransform
 
 # Load your transformed dataset
+#dataset = torch.load("/home/alextu/scratch/DeepNucNet_computecanada/transformed_train_data_pth/train_data_augmented.pth", weights_only = False)
 dataset = torch.load("/home/alextu/scratch/DeepNucNet_computecanada/transformed_train_data_pth/train_data_transformed.pth", weights_only = False)
 
 # Choose a sample to visualize
-img, mask = dataset[22]  # Index can be changed to visualize other samples
+img, mask = dataset[2]  # Index can be changed to visualize other samples
 
 # Convert image to [H, W, C] format and unnormalize (from [-1, 1] → [0, 1])
 img_np = img.permute(1, 2, 0).numpy()
@@ -42,5 +44,5 @@ save_dir = "/home/alextu/scratch/DeepNucNet_computecanada/results/training_data_
 os.makedirs(save_dir, exist_ok=True)
 
 # Save and show
-plt.savefig(os.path.join(save_dir, "row22.png"))
+plt.savefig(os.path.join(save_dir, "row2.png"))
 plt.show()

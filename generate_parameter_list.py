@@ -1,4 +1,3 @@
-# generate_param_list.py
 import itertools
 
 batch_sizes = [8, 16, 32]

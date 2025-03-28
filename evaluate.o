@@ -1,0 +1,206 @@
+Model loaded from model_unetR.py:
+UNETR(
+  (vit): ViT(
+    (patch_embedding): PatchEmbeddingBlock(
+      (patch_embeddings): Conv2d(3, 768, kernel_size=(16, 16), stride=(16, 16))
+      (dropout): Dropout(p=0.0, inplace=False)
+    )
+    (blocks): ModuleList(
+      (0-11): 12 x TransformerBlock(
+        (mlp): MLPBlock(
+          (linear1): Linear(in_features=768, out_features=3072, bias=True)
+          (linear2): Linear(in_features=3072, out_features=768, bias=True)
+          (fn): GELU(approximate='none')
+          (drop1): Dropout(p=0.0, inplace=False)
+          (drop2): Dropout(p=0.0, inplace=False)
+        )
+        (norm1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (attn): SABlock(
+          (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          (qkv): Linear(in_features=768, out_features=2304, bias=False)
+          (to_q): Identity()
+          (to_k): Identity()
+          (to_v): Identity()
+          (input_rearrange): Rearrange('b h (qkv l d) -> qkv b l h d', qkv=3, l=12)
+          (out_rearrange): Rearrange('b l h d -> b h (l d)')
+          (drop_output): Dropout(p=0.0, inplace=False)
+          (drop_weights): Dropout(p=0.0, inplace=False)
+        )
+        (norm2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (norm_cross_attn): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (cross_attn): CrossAttentionBlock(
+          (out_proj): Linear(in_features=768, out_features=768, bias=True)
+          (to_q): Linear(in_features=768, out_features=768, bias=False)
+          (to_k): Linear(in_features=768, out_features=768, bias=False)
+          (to_v): Linear(in_features=768, out_features=768, bias=False)
+          (input_rearrange): Rearrange('b h (l d) -> b l h d', l=12)
+          (out_rearrange): Rearrange('b l h d -> b h (l d)')
+          (drop_output): Dropout(p=0.0, inplace=False)
+          (drop_weights): Dropout(p=0.0, inplace=False)
+        )
+      )
+    )
+    (norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  )
+  (encoder1): UnetrBasicBlock(
+    (layer): UnetResBlock(
+      (conv1): Convolution(
+        (conv): Conv2d(3, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      )
+      (conv2): Convolution(
+        (conv): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      )
+      (lrelu): LeakyReLU(negative_slope=0.01, inplace=True)
+      (norm1): InstanceNorm2d(16, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+      (norm2): InstanceNorm2d(16, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+      (conv3): Convolution(
+        (conv): Conv2d(3, 16, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      )
+      (norm3): InstanceNorm2d(16, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+    )
+  )
+  (encoder2): UnetrPrUpBlock(
+    (transp_conv_init): Convolution(
+      (conv): ConvTranspose2d(768, 32, kernel_size=(2, 2), stride=(2, 2), bias=False)
+    )
+    (blocks): ModuleList(
+      (0-1): 2 x Sequential(
+        (0): Convolution(
+          (conv): ConvTranspose2d(32, 32, kernel_size=(2, 2), stride=(2, 2), bias=False)
+        )
+        (1): UnetResBlock(
+          (conv1): Convolution(
+            (conv): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          )
+          (conv2): Convolution(
+            (conv): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          )
+          (lrelu): LeakyReLU(negative_slope=0.01, inplace=True)
+          (norm1): InstanceNorm2d(32, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+          (norm2): InstanceNorm2d(32, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+        )
+      )
+    )
+  )
+  (encoder3): UnetrPrUpBlock(
+    (transp_conv_init): Convolution(
+      (conv): ConvTranspose2d(768, 64, kernel_size=(2, 2), stride=(2, 2), bias=False)
+    )
+    (blocks): ModuleList(
+      (0): Sequential(
+        (0): Convolution(
+          (conv): ConvTranspose2d(64, 64, kernel_size=(2, 2), stride=(2, 2), bias=False)
+        )
+        (1): UnetResBlock(
+          (conv1): Convolution(
+            (conv): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          )
+          (conv2): Convolution(
+            (conv): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          )
+          (lrelu): LeakyReLU(negative_slope=0.01, inplace=True)
+          (norm1): InstanceNorm2d(64, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+          (norm2): InstanceNorm2d(64, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+        )
+      )
+    )
+  )
+  (encoder4): UnetrPrUpBlock(
+    (transp_conv_init): Convolution(
+      (conv): ConvTranspose2d(768, 128, kernel_size=(2, 2), stride=(2, 2), bias=False)
+    )
+    (blocks): ModuleList()
+  )
+  (decoder5): UnetrUpBlock(
+    (transp_conv): Convolution(
+      (conv): ConvTranspose2d(768, 128, kernel_size=(2, 2), stride=(2, 2), bias=False)
+    )
+    (conv_block): UnetResBlock(
+      (conv1): Convolution(
+        (conv): Conv2d(256, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      )
+      (conv2): Convolution(
+        (conv): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      )
+      (lrelu): LeakyReLU(negative_slope=0.01, inplace=True)
+      (norm1): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+      (norm2): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+      (conv3): Convolution(
+        (conv): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      )
+      (norm3): InstanceNorm2d(128, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+    )
+  )
+  (decoder4): UnetrUpBlock(
+    (transp_conv): Convolution(
+      (conv): ConvTranspose2d(128, 64, kernel_size=(2, 2), stride=(2, 2), bias=False)
+    )
+    (conv_block): UnetResBlock(
+      (conv1): Convolution(
+        (conv): Conv2d(128, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      )
+      (conv2): Convolution(
+        (conv): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      )
+      (lrelu): LeakyReLU(negative_slope=0.01, inplace=True)
+      (norm1): InstanceNorm2d(64, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+      (norm2): InstanceNorm2d(64, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+      (conv3): Convolution(
+        (conv): Conv2d(128, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      )
+      (norm3): InstanceNorm2d(64, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+    )
+  )
+  (decoder3): UnetrUpBlock(
+    (transp_conv): Convolution(
+      (conv): ConvTranspose2d(64, 32, kernel_size=(2, 2), stride=(2, 2), bias=False)
+    )
+    (conv_block): UnetResBlock(
+      (conv1): Convolution(
+        (conv): Conv2d(64, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      )
+      (conv2): Convolution(
+        (conv): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      )
+      (lrelu): LeakyReLU(negative_slope=0.01, inplace=True)
+      (norm1): InstanceNorm2d(32, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+      (norm2): InstanceNorm2d(32, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+      (conv3): Convolution(
+        (conv): Conv2d(64, 32, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      )
+      (norm3): InstanceNorm2d(32, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+    )
+  )
+  (decoder2): UnetrUpBlock(
+    (transp_conv): Convolution(
+      (conv): ConvTranspose2d(32, 16, kernel_size=(2, 2), stride=(2, 2), bias=False)
+    )
+    (conv_block): UnetResBlock(
+      (conv1): Convolution(
+        (conv): Conv2d(32, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      )
+      (conv2): Convolution(
+        (conv): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      )
+      (lrelu): LeakyReLU(negative_slope=0.01, inplace=True)
+      (norm1): InstanceNorm2d(16, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+      (norm2): InstanceNorm2d(16, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+      (conv3): Convolution(
+        (conv): Conv2d(32, 16, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      )
+      (norm3): InstanceNorm2d(16, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)
+    )
+  )
+  (out): UnetOutBlock(
+    (conv): Convolution(
+      (conv): Conv2d(16, 1, kernel_size=(1, 1), stride=(1, 1))
+    )
+  )
+)
+[INFO] Using device: cuda
+
+=== Evaluation Results on Test Set ===
+Average Dice:       0.7895
+Average Precision:  0.8717
+Average Recall:     0.7793
+Average Hausdorff:  28.0549

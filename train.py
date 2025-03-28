@@ -16,7 +16,7 @@ from monai.transforms import AsDiscrete, Compose, EnsureType
 from monai.data import decollate_batch
 
 from model_unetR import model
-from transform_train_images import Dataset, PairedTransform
+from transform_train_test_images_with_augmentations import Dataset, PairedTransform
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"[INFO] Using device: {device}")

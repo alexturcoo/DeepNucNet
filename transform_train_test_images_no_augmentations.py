@@ -1,13 +1,13 @@
-import PIL
 import torch
+import PIL
 import numpy as np
 from torchvision import transforms as tsf
-import torchvision.transforms.functional as F
 
 # Convert binary mask to float tensor in [0, 1]
 def binary_mask_to_tensor(x):
     return torch.tensor(np.array(x), dtype=torch.float32) / 255.0
 
+# Same transform class — no changes
 class PairedTransform:
     def __init__(self):
         self.resize = tsf.Resize((256, 256))
@@ -28,6 +28,7 @@ class PairedTransform:
 
         return img, mask
 
+# Same Dataset class — no changes
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, data, transform):
         self.datas = data
@@ -51,20 +52,30 @@ class Dataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.datas)
 
-# === Apply transform and save dataset ===
+# === Apply transforms and save ===
 if __name__ == "__main__":
     paired_transform = PairedTransform()
 
+    # Transform and save train data
     train_data = torch.load(
         "/home/alextu/scratch/DeepNucNet_computecanada/train_test_data_pth/train_data.pth",
         weights_only=False
     )
-
-    dataset = Dataset(train_data, paired_transform)
-
+    train_dataset = Dataset(train_data, paired_transform)
     torch.save(
-        dataset,
+        train_dataset,
         "/home/alextu/scratch/DeepNucNet_computecanada/transformed_train_data_pth/train_data_transformed.pth"
     )
+    print("Transformed TRAIN dataset saved.")
 
-    print("Transformed dataset saved with masks shaped [1, 256, 256]. Ready for training.")
+    # Transform and save test data
+    test_data = torch.load(
+        "/home/alextu/scratch/DeepNucNet_computecanada/train_test_data_pth/test_data.pth",
+        weights_only=False
+    )
+    test_dataset = Dataset(test_data, paired_transform)
+    torch.save(
+        test_dataset,
+        "/home/alextu/scratch/DeepNucNet_computecanada/transformed_train_data_pth/test_data_transformed.pth"
+    )
+    print("Transformed TEST dataset saved.")
