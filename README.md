@@ -84,7 +84,7 @@ OUTPUT_DIR="your_file_path/DeepNucNet/results"
 ```
 Training will output the following plots to assess performance
 
-![Training Loss and Validation Loss Curves.](/results/saved_images/training_metrics.png)
+![Training Loss and Validation Loss Curves.](/results/model_training_images/training_metrics.png)
 
 
 # Step 6: Hyperparameter Tuning
@@ -120,7 +120,7 @@ model_dirs = ["model_unet1", "model_unet2", "model_unet3", "model_unetR"] #list 
 
 Outputted heatmap plots can be used to determine which combination of batch size, learning rate hyperparameters yield the best mean dice scores.
 <!-- ADD IMAGE OF TUNING PLOTS -->
-![Visualization of Hyperparameter Tuning.](/)
+![Visualization of Hyperparameter Tuning.](/results/tune_images/model_unet2_heatmap_dice_bs_lr.png)
 
 
 ## Visualize Image Segmentation Results 
@@ -139,7 +139,7 @@ python your_file_path/evaluate.py
 ```
 
 <!-- ADD IMAGE OF IMAGE INFERENCE/MASK OVERLAYS -->
-![Image, Ground Truth Masks, and Inference Results.](/)
+![Image, Ground Truth Masks, and Inference Results.](/results/evaluation_imgs/test_result_2.png)
 
 
 
@@ -155,7 +155,7 @@ Compares evaluation results between models.
 base_dir = "your_file_path/output_dir" #output_dir used from evaluate.sh
 ```
 <!-- ADD IMAGE OF between model boxplots -->
-![Comparing model performance.](/)
+![Comparing model performance.](/results/evaluation_metrics/mean_metric_subplots_2x2_unet2_vs_unetR_labeled.png)
 
 ---
 
@@ -173,4 +173,4 @@ output_path = "your_file_path/unetR_augmentation_comparison_boxplot.png"
 ```
 
 <!-- ADD IMAGE OF within model, augmented vs unaugment boxplot -->
-![Augmented vs Unaugmented training results.](/)
+![Augmented vs Unaugmented training results.](/results/evaluation_metrics/unet2_augmentation_comparison_boxplot.png)
