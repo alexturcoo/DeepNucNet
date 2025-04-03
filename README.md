@@ -15,7 +15,7 @@ To process the Images and corresponding masks (labels) for the nuclei image. Use
 TRAIN_PATH = 'your_file_path/stage1_train/'    
 TEST_PATH = 'your_file_path/stage1_test/'
 
-# CSV with RLE masks for test set, solution from ?
+# CSV with RLE masks for test set, solution from https://bbbc.broadinstitute.org/BBBC038
 TEST_CSV = 'your_file_path/stage1_solution.csv'
 
 # Output paths for saving .pth files
