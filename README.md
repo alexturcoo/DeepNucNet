@@ -6,35 +6,54 @@ Go to the following link https://www.kaggle.com/competitions/data-science-bowl-2
 
 # Step 2: Processing the Data
 To process the Images and corresponding masks (labels) for the nuclei image. Use the script
-`preprocess.py` - This script prepares the image data. Loads images from downloaded data, prepares segmentation masks as labelled tensors.
+`preprocess_train_test_data.py` - This script prepares the image data. Loads images from downloaded data, prepares segmentation masks as labelled tensors. Also prepares the test set masks (which must be processed from RLE format)
 
 *IMPORTANT PARAMETERS TO CHANGE IN SCRIPT*
 
 ```python
-# Define paths 
+# Define paths for data from Kaggle
 TRAIN_PATH = 'your_file_path/stage1_train/'    
 TEST_PATH = 'your_file_path/stage1_test/'
 
+# CSV with RLE masks for test set, solution from ?
+TEST_CSV = 'your_file_path/stage1_solution.csv'
+
 # Output paths for saving .pth files
 TRAIN_PTH = 'your_file_path/train_test_pth_data/train_data.pth'
-TEST_PTH = 'your_file_path/DeepNucNet/train_test_pth_datatest_data.pth'`
+TEST_PTH = 'your_file_path/train_test_data_pth/test_data.pth'
 ```
 
 This will output 2 .pth files, one for train data (`train_data.pth`), and one for test data (`test_data.pth`).
 
 # Step 3: Transforming images for training
-To transform the images prior to training, Use the script
-`transform_train_images.py`
+To transform the images prior to training, Use the scripts
+`transform_train_test_images_no_augmentations.py` or `transform_train_test_images_with_augmentations.py` for transforming train images without or with image augmentations respectively.
 
-*IMPORTANT PARAMETERS TO CHANGE IN SCRIPT*
+*IMPORTANT PARAMETERS TO CHANGE IN SCRIPTS*
 
+`transform_train_test_images_no_augmentations.py`:
 ```python
-train_data = torch.load("your_file_path/train_test_data_pth/train_data.pth", weights_only=False)  # From Step 1
-dataset = Dataset(train_data,s_trans,t_trans)
-torch.save(dataset, "your_file_path/transformed_train_data_pth/train_data_transformed.pth")  # saves the entire Dataset object
-```
+# Within "__main__"
+train_data = torch.load("your_file_path/train_test_data_pth/train_data.pth", weights_only=False)  # From Step 2: Processing the Data
+torch.save(train_dataset, "your_file_path/transformed_train_data_pth/train_data_transformed.pth")  # saves the entire Dataset object
 
-This will output the transformed saved training data as `train_data_transformed.pth` 
+test_data = torch.load("your_file_path/transformed_train_data_pth/test_data.pth", weights_only=False)
+torch.save(test_dataset, "your_file_path/transformed_train_data_pth/test_data_transformed.pth")
+```
+This will output the transformed saved training and test data as `train_data_transformed.pth` and `test_data_transformed.pth`
+
+---
+
+`transform_train_test_images_with_augmentations.py`:
+```python
+# Within "__main__"
+train_data = torch.load("your_file_path/train_test_data_pth/train_data.pth", weights_only=False) 
+test_data = torch.load("your_file_path/train_test_data_pth/test_data.pth", weights_only=False)
+
+torch.save(train_dataset, "your_file_path/transformed_train_data_pth/train_data_augmented.pth")
+torch.save(test_dataset, "your_file_path/transformed_train_data_pth/test_data_augmented.pth")
+```
+This will output the transformed *augmented training* and *clean test* data as `train_data_augmented.pth` and `test_data_augmented.pth`
 
 # Step 4: Visualize Train Data
 If you are interested in seeing what the training data looks like (images and corresponding masks), you can use the following code
@@ -49,7 +68,7 @@ dataset = torch.load("your_file_path/transformed_train_data_pth/train_data_trans
 ```
 
 # Step 5: Training the Model
-The script below will run model training using the processed and transformed training data created above.
+The script `train.sh` will run model training using the processed and transformed training data created above.
 
 *IMPORTANT PARAMETERS TO CHANGE IN SCRIPT*
 
@@ -58,7 +77,7 @@ DATASET_PATH="your_file_path/transformed_train_data_pth/train_data_transformed.p
 BATCH_SIZE=16
 LEARNING_RATE=0.0001
 NUM_WORKERS=0
-EPOCHS=10
+EPOCHS=200
 TRAIN_RATIO=0.8
 VAL_INTERVAL=2
 OUTPUT_DIR="your_file_path/DeepNucNet/results"
@@ -66,8 +85,92 @@ OUTPUT_DIR="your_file_path/DeepNucNet/results"
 Training will output the following plots to assess performance
 
 ![Training Loss and Validation Loss Curves.](/results/saved_images/training_metrics.png)
-![Training Loss and Validation Loss Curves.](/results/saved_images/inference_0.png)
+
+
+# Step 6: Hyperparameter Tuning
+The script `tune.sh` uses the generated `param_list.txt` to run a SLURM job array for to train and find the optimally performing model. The script will run 60 jobs, one per line of hyperparameters from `param_list.txt` - was performed with 1 GPU and 40G of memory.
+
+*IMPORTANT PARAMETERS TO CHANGE IN SCRIPT*
+`tune.sh`
+```python
+DATASET_PATH="your_file_path/transformed_train_data_pth/train_data_[transformed] OR [augmented].pth"
+OUTPUT_DIR="your_file_path/tune_array_results/model_unet[model desired]/bs${BATCH_SIZE}_lr${LEARNING_RATE}_ep${EPOCHS}" #change directory according to the model being trained
+```
+
+If you would like to change the hyperparameters tested, edit the batch_sizes, learning_rates or epoch_list in `generate_parameter_list.py`
+
+### Step 6.1: Process Tuning Results
+After all model training is complete, use `process_tune_results.py` to process each model's training results and combine into a single csv. 
+
+*IMPORTANT PARAMETERS TO CHANGE IN SCRIPT*
+```python
+base_dir = "your_file_path/tune_array_results/"
+model_dirs = ["model_unet1", "model_unet2", "model_unet3", "model_unetR"] #list of your models trained
+```
+
+# Step 7: Evaluation Plots
+## Visualize Hyperparameter Tuning Results
+Following Step 6.1, use `visualize_tune_results.py` to visualize hyperparameters versus mean dice score for each trained model.
+
+*IMPORTANT PARAMETERS TO CHANGE IN SCRIPT*
+```python
+base_dir = "your_file_path/tune_array_results/"
+model_dirs = ["model_unet1", "model_unet2", "model_unet3", "model_unetR"] #list of your models trained
+```
+
+Outputted heatmap plots can be used to determine which combination of batch size, learning rate hyperparameters yield the best mean dice scores.
+<!-- ADD IMAGE OF TUNING PLOTS -->
+![Visualization of Hyperparameter Tuning.](/)
+
+
+## Visualize Image Segmentation Results 
+Visualize model inferences on the sample images from the test dataset. Each test image is evaluated individually for the metrics of interest (Dice, Precision, Recall and Hausdorff)
+
+Using `evaluate.sh`, the script will run `evaluate.py` which will generate an images to compare Test Image, Ground Truth Mask and Inference Result outputting the metrics and
+
+*IMPORTANT PARAMETERS TO CHANGE IN SCRIPT*
+
+`evaluate.sh`
+```sh
+python your_file_path/evaluate.py 
+  --model_path your_file_path/tune_array_results/model_unetR/bs8_lr0.0001_ep300/best_model/best_metric_model.pth #directory to the desired model
+  --test_data_path your_file_path/transformed_train_data_pth/test_data_augmented.pth #test data directory
+  --output_dir your_file_path/evaluate_model_results_with_augmentations/model_unetR
+```
+
+<!-- ADD IMAGE OF IMAGE INFERENCE/MASK OVERLAYS -->
+![Image, Ground Truth Masks, and Inference Results.](/)
 
 
 
+## Plotting Performance Metrics
+Outputs boxplots and swarm plots for each metrics (Dice, Precision, Recall and Hausdorff)
 
+`visualize_evaluation_results.py`
+
+Compares evaluation results between models.
+
+*IMPORTANT PARAMETERS TO CHANGE IN SCRIPT*
+```python
+base_dir = "your_file_path/output_dir" #output_dir used from evaluate.sh
+```
+<!-- ADD IMAGE OF between model boxplots -->
+![Comparing model performance.](/)
+
+---
+
+`visualize_evaluation_results_byAugmentation.py`
+
+Compares evaluation results within a model type, between being trained using augmented and unaugmented training images.
+
+*IMPORTANT PARAMETERS TO CHANGE IN SCRIPT*
+```python
+base_dirs = {
+    "No Augmentations": "your_file_path/evaluate_model_results_no_augmentations/model_unetR/test_metrics.csv",
+    "With Augmentations": "your_file_path/evaluate_model_results_with_augmentations/model_unetR/test_metrics.csv"
+} #showing example of directories for model_unetR
+output_path = "your_file_path/unetR_augmentation_comparison_boxplot.png"
+```
+
+<!-- ADD IMAGE OF within model, augmented vs unaugment boxplot -->
+![Augmented vs Unaugmented training results.](/)
